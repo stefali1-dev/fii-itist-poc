@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  fii
+
+  SAM Template for API Gateway proxy with SQS and DynamoDB
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  ProxyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello_world/
+      Handler: app.lambda_handler
+      Runtime: python3.13
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          SQS_QUEUE_URL: !Ref TaskQueue
+          DYNAMODB_TABLE: !Ref ParticipantiTable
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt TaskQueue.QueueName
+        - DynamoDBWritePolicy:
+            TableName: !Ref ParticipantiTable
+      Events:
+        ProxyApi:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+
+  TaskQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: fii-task-queue
+
+  ParticipantiTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: participanti
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+Outputs:
+  ApiGatewayUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  SQSQueueUrl:
+    Description: "SQS Queue URL"
+    Value: !Ref TaskQueue
+  DynamoDBTable:
+    Description: "DynamoDB Table Name"
+    Value: !Ref ParticipantiTable
