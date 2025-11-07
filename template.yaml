@@ -33,6 +33,11 @@ Resources:
           Properties:
             Path: /{proxy+}
             Method: ANY
+        RootApi:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
 
   TaskQueue:
     Type: AWS::SQS::Queue
