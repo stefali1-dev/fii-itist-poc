@@ -131,6 +131,10 @@
           });
           if (res.ok) {
             msg.textContent = "Submitted!";
+            // Redirect to results page after a brief delay
+            setTimeout(() => {
+              window.location.href = "https://stefanleustean.com/results";
+            }, 500);
           } else {
             msg.textContent = "Submission failed (" + res.status + ").";
           }
