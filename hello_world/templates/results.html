@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Conference Participants</title>
+    <style>
+      :root {
+        --bg: #0b132b;
+        --accent1: #5bc0be;
+        --accent2: #6fffe9;
+        --accent3: #3a506b;
+        --accent4: #ff6b9d;
+        --accent5: #ffd23f;
+        --text: #eaeaea;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        overflow-x: hidden;
+        position: relative;
+        min-height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        text-align: center;
+        padding: 40px 20px 30px;
+        background: linear-gradient(
+          180deg,
+          rgba(28, 37, 65, 0.8) 0%,
+          transparent 100%
+        );
+        position: relative;
+        z-index: 100;
+      }
+
+      h1 {
+        font-size: clamp(32px, 6vw, 56px);
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+        animation: fadeInDown 0.8s ease-out;
+      }
+
+      .subtitle {
+        font-size: clamp(16px, 3vw, 20px);
+        opacity: 0.7;
+        animation: fadeInUp 0.8s ease-out 0.2s backwards;
+      }
+
+      /* Participant count badge */
+      .count-badge {
+        display: inline-block;
+        background: rgba(91, 192, 190, 0.2);
+        border: 2px solid var(--accent1);
+        border-radius: 24px;
+        padding: 8px 20px;
+        font-size: 18px;
+        font-weight: 600;
+        margin-top: 15px;
+        animation: fadeInUp 0.8s ease-out 0.4s backwards;
+      }
+
+      /* Wall container */
+      .wall {
+        padding: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        min-height: 60vh;
+        align-content: center;
+      }
+
+      /* Participant name bubble */
+      .participant {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-align: center;
+        word-break: break-word;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+        animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        transition: transform 0.2s ease;
+      }
+
+      .participant:hover {
+        transform: scale(1.05) rotate(2deg);
+      }
+
+      /* Dynamic sizing for variety */
+      .participant.size-sm {
+        font-size: clamp(14px, 2.5vw, 18px);
+        padding: 10px 20px;
+      }
+
+      .participant.size-md {
+        font-size: clamp(16px, 3vw, 22px);
+        padding: 12px 24px;
+      }
+
+      .participant.size-lg {
+        font-size: clamp(18px, 3.5vw, 28px);
+        padding: 14px 28px;
+      }
+
+      .participant.size-xl {
+        font-size: clamp(20px, 4vw, 34px);
+        padding: 16px 32px;
+      }
+
+      /* Color variations */
+      .participant.color-1 {
+        background: linear-gradient(
+          135deg,
+          rgba(91, 192, 190, 0.9),
+          rgba(111, 255, 233, 0.9)
+        );
+        color: #0b132b;
+      }
+
+      .participant.color-2 {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 107, 157, 0.9),
+          rgba(255, 140, 180, 0.9)
+        );
+        color: #ffffff;
+      }
+
+      .participant.color-3 {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 210, 63, 0.9),
+          rgba(255, 230, 120, 0.9)
+        );
+        color: #0b132b;
+      }
+
+      .participant.color-4 {
+        background: linear-gradient(
+          135deg,
+          rgba(138, 43, 226, 0.9),
+          rgba(180, 100, 240, 0.9)
+        );
+        color: #ffffff;
+      }
+
+      .participant.color-5 {
+        background: linear-gradient(
+          135deg,
+          rgba(58, 80, 107, 0.9),
+          rgba(88, 110, 137, 0.9)
+        );
+        color: #ffffff;
+      }
+
+      /* Shimmer effect */
+      .participant::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+        animation-delay: var(--shimmer-delay, 0s);
+      }
+
+      /* Animations */
+      @keyframes popIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.3) rotate(-10deg);
+        }
+        50% {
+          transform: scale(1.1) rotate(5deg);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) rotate(0deg);
+        }
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        }
+        100% {
+          transform: translateX(100%) translateY(100%) rotate(45deg);
+        }
+      }
+
+      /* Particle effects container */
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      .particle {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: var(--accent1);
+        border-radius: 50%;
+        opacity: 0;
+        animation: float 3s ease-out forwards;
+      }
+
+      @keyframes float {
+        0% {
+          opacity: 1;
+          transform: translateY(0) rotate(0deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-150px) rotate(360deg);
+        }
+      }
+
+      /* Loading state */
+      .loading {
+        text-align: center;
+        padding: 40px;
+        font-size: 20px;
+        opacity: 0.6;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.4;
+        }
+        50% {
+          opacity: 0.8;
+        }
+      }
+
+      /* Empty state */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        font-size: 22px;
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Conference Participants</h1>
+      <p class="subtitle">Welcome to our community!</p>
+      <div class="count-badge"><span id="count">0</span> Participants</div>
+    </div>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="wall" id="wall">
+      <div class="loading">Loading participants...</div>
+    </div>
+
+    <script>
+      // Configuration
+      const POLL_INTERVAL = 5000; // 5 seconds
+      const API_ENDPOINT = "/Prod/participants"; // Will be implemented later
+      const USE_MOCK_DATA = true; // Set to false when real endpoint is ready
+
+      // State
+      let knownParticipants = new Set();
+      let mockCallCount = 0;
+
+      // Mock data generator
+      const mockNames = [
+        "Alexandru Popescu",
+        "Maria Ionescu",
+        "Andrei Dumitru",
+        "Elena Popa",
+        "Cristian Marin",
+        "Ana Georgescu",
+        "Mihai Radu",
+        "Diana Stan",
+        "Gabriel Vasile",
+        "Ioana Constantinescu",
+        "Vlad Mocanu",
+        "Laura Dobre",
+        "Stefan Leustean",
+        "Adriana Nistor",
+        "Radu Serban",
+        "Carmen Florea",
+        "Daniel Oprea",
+        "Raluca Barbu",
+      ];
+
+      function getMockData() {
+        mockCallCount++;
+        // Start with 13, add 2 more every call for first few calls
+        const count = Math.min(13 + (mockCallCount - 1) * 2, mockNames.length);
+        return {
+          participants: mockNames.slice(0, count),
+        };
+      }
+
+      // DOM elements
+      const wall = document.getElementById("wall");
+      const countEl = document.getElementById("count");
+      const particlesContainer = document.getElementById("particles");
+
+      // Get random size class
+      function getRandomSize() {
+        const sizes = ["size-sm", "size-md", "size-lg", "size-xl"];
+        const weights = [0.3, 0.4, 0.2, 0.1]; // Probability distribution
+        const random = Math.random();
+        let cumulative = 0;
+
+        for (let i = 0; i < sizes.length; i++) {
+          cumulative += weights[i];
+          if (random <= cumulative) return sizes[i];
+        }
+        return "size-md";
+      }
+
+      // Get random color class
+      function getRandomColor() {
+        const colors = ["color-1", "color-2", "color-3", "color-4", "color-5"];
+        return colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      // Create particle effect
+      function createParticles(x, y) {
+        const particleCount = 12;
+        const colors = ["#5bc0be", "#6fffe9", "#ff6b9d", "#ffd23f", "#8a2be2"];
+
+        for (let i = 0; i < particleCount; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.left = x + "px";
+          particle.style.top = y + "px";
+          particle.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+          particle.style.animationDelay = i * 0.05 + "s";
+
+          // Random direction
+          const angle = (Math.PI * 2 * i) / particleCount;
+          const velocity = 50 + Math.random() * 50;
+          particle.style.setProperty("--tx", Math.cos(angle) * velocity + "px");
+          particle.style.setProperty("--ty", Math.sin(angle) * velocity + "px");
+
+          particlesContainer.appendChild(particle);
+
+          // Remove after animation
+          setTimeout(() => particle.remove(), 3000);
+        }
+      }
+
+      // Add participant to wall
+      function addParticipant(name, animate = true) {
+        if (knownParticipants.has(name)) return;
+
+        knownParticipants.add(name);
+
+        const bubble = document.createElement("div");
+        bubble.className = `participant ${getRandomSize()} ${getRandomColor()}`;
+        bubble.textContent = name;
+        bubble.style.setProperty("--shimmer-delay", Math.random() * 3 + "s");
+
+        if (!animate) {
+          bubble.style.animation = "none";
+        }
+
+        wall.appendChild(bubble);
+
+        // Trigger particle effect for new participants
+        if (animate) {
+          const rect = bubble.getBoundingClientRect();
+          const x = rect.left + rect.width / 2;
+          const y = rect.top + rect.height / 2;
+          setTimeout(() => createParticles(x, y), 300);
+        }
+
+        updateCount();
+      }
+
+      // Update participant count
+      function updateCount() {
+        countEl.textContent = knownParticipants.size;
+      }
+
+      // Fetch participants from API
+      async function fetchParticipants() {
+        try {
+          let data;
+
+          if (USE_MOCK_DATA) {
+            // Simulate network delay
+            await new Promise((resolve) => setTimeout(resolve, 300));
+            data = getMockData();
+          } else {
+            const response = await fetch(API_ENDPOINT);
+            if (!response.ok) throw new Error("Failed to fetch");
+            data = await response.json();
+          }
+
+          const participants = data.participants || [];
+
+          // Clear loading message on first load
+          if (wall.querySelector(".loading")) {
+            wall.innerHTML = "";
+          }
+
+          // Add new participants
+          const hasNewParticipants = participants.some(
+            (name) => !knownParticipants.has(name)
+          );
+          participants.forEach((name, index) => {
+            // Add small delay between each name for staggered animation
+            setTimeout(() => {
+              addParticipant(name, hasNewParticipants);
+            }, index * 50);
+          });
+
+          // Show empty state if no participants
+          if (
+            participants.length === 0 &&
+            !wall.querySelector(".empty-state")
+          ) {
+            wall.innerHTML =
+              '<div class="empty-state">No participants yet. Be the first to join!</div>';
+          }
+        } catch (error) {
+          console.error("Error fetching participants:", error);
+          if (wall.querySelector(".loading")) {
+            wall.innerHTML =
+              '<div class="empty-state">Error loading participants</div>';
+          }
+        }
+      }
+
+      // Initialize
+      fetchParticipants();
+      setInterval(fetchParticipants, POLL_INTERVAL);
+    </script>
+  </body>
+</html>
