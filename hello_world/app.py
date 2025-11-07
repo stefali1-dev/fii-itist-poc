@@ -1,7 +1,5 @@
 import json
 import os
-import json
-import os
 import boto3
 import uuid
 from datetime import datetime
@@ -62,7 +60,7 @@ def _html_form_page() -> str:
         if (!name) { msg.textContent = 'Please enter your name.'; return; }
         msg.textContent = 'Submitting…';
         try {
-          const res = await fetch('/formular', {
+          const res = await fetch('/Prod/formular', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name })
@@ -129,6 +127,7 @@ def _read_body(event: dict) -> str:
 
 
 def lambda_handler(event, context):
+    logger.info(event)
     try:
         method = event.get('httpMethod')
         path = event.get('path') or '/'
@@ -221,59 +220,3 @@ def lambda_handler(event, context):
             'headers': {'Content-Type': 'application/json'},
             'body': json.dumps({'error': str(e)})
         }
-
-        # For all other routes/methods, process and record the request
-                queue_url = os.environ['SQS_QUEUE_URL']
-                table_name = os.environ['DYNAMODB_TABLE']
-                table = dynamodb.Table(table_name)
-
-        body = _read_body(event)
-
-                # Generate unique ID
-                request_id = str(uuid.uuid4())
-
-                # Send task to SQS
-                sqs_message = {
-                        'requestId': request_id,
-                        'method': method,
-                        'path': path,
-                        'body': body,
-                        'timestamp': datetime.utcnow().isoformat()
-                }
-
-                sqs.send_message(
-                        QueueUrl=queue_url,
-                        MessageBody=json.dumps(sqs_message)
-                )
-
-                # Write to DynamoDB
-                table.put_item(
-                        Item={
-                                'id': request_id,
-                                'method': method,
-                                'path': path,
-                                'body': body,
-                                'timestamp': datetime.utcnow().isoformat(),
-                                'status': 'processed'
-                        }
-                )
-
-                return {
-                        'statusCode': 200,
-                        'headers': {'Content-Type': 'application/json'},
-                        'body': json.dumps({
-                                'message': 'Request processed successfully',
-                                'requestId': request_id,
-                                'method': method,
-                                'path': path
-                        })
-                }
-
-        except Exception as e:
-                return {
-                        'statusCode': 500,
-                        'headers': {'Content-Type': 'application/json'},
-                        'body': json.dumps({
-                                'error': str(e)
-                        })
-                }
