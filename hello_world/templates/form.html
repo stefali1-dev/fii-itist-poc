@@ -124,7 +124,7 @@
         }
         msg.textContent = "Submitting…";
         try {
-          const res = await fetch("/Prod/formular", {
+          const res = await fetch("/formular", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name }),

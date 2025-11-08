@@ -1,7 +1,7 @@
 """Main Lambda handler - routes requests to appropriate handlers."""
 import json
 from services import logger
-from handlers import handle_home, handle_formular, handle_results, handle_default
+from handlers import handle_home, handle_formular, handle_results, handle_default, handle_get_formular
 
 
 def lambda_handler(event, context):
@@ -29,7 +29,9 @@ def lambda_handler(event, context):
         
         if method == 'GET' and path == '/results':
             return handle_results(event, context)
-        
+
+        if method == 'GET' and path == '/participants':
+            return handle_get_formular(event, context)        
         # Catch-all for all other requests
         return handle_default(event, context)
     

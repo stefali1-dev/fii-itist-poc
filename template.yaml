@@ -25,8 +25,7 @@ Resources:
       Policies:
         - SQSSendMessagePolicy:
             QueueName: !GetAtt TaskQueue.QueueName
-        - DynamoDBWritePolicy:
-            TableName: !Ref ParticipantiTable
+        - AmazonDynamoDBFullAccess
       Events:
         ProxyApi:
           Type: Api
@@ -38,6 +37,10 @@ Resources:
           Properties:
             Path: /
             Method: ANY
+    Metadata:
+      BuildMethod: python3.13       # match your runtime
+      BuildProperties:
+        RequirementsFile: requirements.txt   # relative to CodeUri (hello_world/)
 
   TaskQueue:
     Type: AWS::SQS::Queue

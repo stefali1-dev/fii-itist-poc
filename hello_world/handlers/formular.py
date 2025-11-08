@@ -1,8 +1,10 @@
 """Handler for POST /formular - processes form submissions."""
 import json
 import os
-from services import sqs, logger
-from utils import lower_headers, extract_ip, read_body, parse_phone_model
+from services import sqs, logger, dynamodb
+from utils import lower_headers, extract_ip, read_body, summarize_ua
+from datetime import datetime
+import uuid
 
 
 def handle_formular(event: dict, context) -> dict:
@@ -45,7 +47,7 @@ def handle_formular(event: dict, context) -> dict:
         }
     
     # Extract metadata
-    phone_model = parse_phone_model(headers.get('user-agent'))
+    phone_model = summarize_ua(headers.get('user-agent'))
     ip = extract_ip(event) or ''
     queue_url = os.environ['SQS_QUEUE_URL']
     
@@ -55,6 +57,21 @@ def handle_formular(event: dict, context) -> dict:
         'phoneModel': phone_model,
         'ip': ip
     }
+    
+    table_name = os.environ['DYNAMODB_TABLE']
+    table = dynamodb.Table(table_name)
+    
+    request_id = str(uuid.uuid4())
+    
+    table.put_item(Item={
+        'id': request_id,
+        'name': name,
+        'phoneModel': phone_model,
+        'ip': ip,
+        'timestamp': datetime.utcnow().isoformat(),
+        'status': 'processed'
+    })
+    
     logger.info("formular_submission %s", json.dumps(message))
     sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
     
