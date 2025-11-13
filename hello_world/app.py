@@ -1,7 +1,7 @@
 """Main Lambda handler - routes requests to appropriate handlers."""
 import json
-from services import logger
-from handlers import handle_home, handle_formular, handle_results, handle_default
+from aws_clients import logger
+from handlers import handle_home, handle_form, handle_results, handle_default
 
 
 def lambda_handler(event, context):
@@ -10,7 +10,7 @@ def lambda_handler(event, context):
     
     Routes:
     - GET /       -> handle_home (HTML form)
-    - POST /formular -> handle_formular (form submission)
+    - POST /form  -> handle_form (form submission)
     - GET /results -> handle_results (participants display page)
     - *           -> handle_default (catch-all)
     """
@@ -24,8 +24,8 @@ def lambda_handler(event, context):
         if method == 'GET' and path == '/':
             return handle_home(event, context)
         
-        if method == 'POST' and path == '/formular':
-            return handle_formular(event, context)
+        if method == 'POST' and path == '/form':
+            return handle_form(event, context)
         
         if method == 'GET' and path == '/results':
             return handle_results(event, context)

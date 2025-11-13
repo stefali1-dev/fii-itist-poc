@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   fii
@@ -15,18 +15,18 @@ Resources:
     Properties:
       CodeUri: hello_world/
       Handler: app.lambda_handler
-      Runtime: python3.13
+      Runtime: python3.12
       Architectures:
         - x86_64
       Environment:
         Variables:
           SQS_QUEUE_URL: !Ref TaskQueue
-          DYNAMODB_TABLE: !Ref ParticipantiTable
+          DYNAMODB_TABLE: !Ref ParticipantsTable
       Policies:
         - SQSSendMessagePolicy:
             QueueName: !GetAtt TaskQueue.QueueName
         - DynamoDBWritePolicy:
-            TableName: !Ref ParticipantiTable
+            TableName: !Ref ParticipantsTable
       Events:
         ProxyApi:
           Type: Api
@@ -44,10 +44,10 @@ Resources:
     Properties:
       QueueName: fii-task-queue
 
-  ParticipantiTable:
+  ParticipantsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: participanti
+      TableName: participants
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: id
@@ -65,4 +65,4 @@ Outputs:
     Value: !Ref TaskQueue
   DynamoDBTable:
     Description: "DynamoDB Table Name"
-    Value: !Ref ParticipantiTable
+    Value: !Ref ParticipantsTable

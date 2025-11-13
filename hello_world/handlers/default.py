@@ -3,7 +3,7 @@ import json
 import os
 import uuid
 from datetime import datetime
-from services import sqs, dynamodb
+from aws_clients import sqs, dynamodb
 from utils import read_body
 
 

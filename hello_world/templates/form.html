@@ -124,7 +124,7 @@
         }
         msg.textContent = "Submitting…";
         try {
-          const res = await fetch("/Prod/formular", {
+          const res = await fetch("/form", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name }),
@@ -133,7 +133,7 @@
             msg.textContent = "Submitted!";
             // Redirect to results page after a brief delay
             setTimeout(() => {
-              window.location.href = "https://stefanleustean.com/results";
+              window.location.href = "/results";
             }, 500);
           } else {
             msg.textContent = "Submission failed (" + res.status + ").";
